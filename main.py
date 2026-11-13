@@ -1,13 +1,12 @@
 import json,os,urllib.request as U
-V=dict(zip('PNBRQK',(100,300,320,500,900,20000)))
+V=dict(zip('PNBRQK',(88,309,331,494,980,20000)))
 S=(-11,-9,9,11,-10,-1,1,10);D={'N':(-21,-19,-12,-8,8,12,19,21),'B':S[:4],'R':S[4:],'Q':S,'K':S}
-TS=dict(zip('PBKRQ','22222222<<<<<<<<44688644334774332226622231022013344..44322222222|.000000.032222300444444002444420033443300234432002222220.000000.|,**((**,,**((**,,**((**,,**((**,.,,**,,.0......06622226668422486|2222222234444443122222211222222112222221122222211222222122233222|.000000.022222200233332012333321223333220333332002322220.000000.'.split('|')))
-TS['N']=TS['B']
+TS=dict(zip('PNBRQK','77777777SVMNMQKI@BBACBB=9;9:99:668678784576677:5586679;477777777|!*2/:+/"-2<:8;500;<>?C<749;?=?:747:;;;942689:87300567731*0/2320.|35.342644865:<816:;;:=;768:=<<8769:;;9876899::876787889416345433|;<<>?9;<;;>>?>:<7::;9;=8569::;6545777674255576622556675046798642|39<;@=<=35:;;?=<469=?@>>578:===;478;::;945777998145666344244512.|)674058799688:557;977<>65787788407655551456556634772467607615374'.split('|')))
 SG={}
 for p,t in TS.items():
  SG[p]=[0]*120;SG[p.lower()]=[0]*120
  for q in range(64):
-  v=V[p]+(ord(t[q])-50)*5;SG[p][(q//8+2)*10+q%8+1]=v;SG[p.lower()][(9-q//8)*10+q%8+1]=-v
+  v=V[p]+(ord(t[q])-55)*5;SG[p][(q//8)*10+q%8+21]=v;SG[p.lower()][91-(q//8)*10+q%8]=-v
 def gen(b,cs,ep):
  for i,c in enumerate(b):
   if c=='P':
@@ -50,16 +49,16 @@ def atk(b):
   if b[k+d]=='k'or b[j] in('bq' if abs(d)in(9,11)else 'rq'):return 1
  return 0
 M=10**5
-nd=0;cap=120000;TT={}
+nd=0;cap=120000;TT={};KL={}
 def qs(b,cs,ep,a,be,q):
  global nd;nd+=1
  if nd>cap:raise IndexError
  ic=q<1 and atk(b)
  if not ic:
-  s=sum(SG[c][i] for i,c in enumerate(b) if c in SG)+30*(b.count('B')>1)-30*(b.count('b')>1)
+  s=sum(SG[c][i] for i,c in enumerate(b) if c in SG)
   if s>=be:return be
   if s>a:a=s
- ms=[m for m in gen(b,cs,ep) if m[2]or m[1]==ep or(ic and(b[m[1]]in'pnbrqk'or b[m[0]]=='K'))or(b[m[1]]in'pnbrqk'and V[b[m[1]].upper()]+250>=V[b[m[0]]])]
+ ms=[m for m in gen(b,cs,ep) if m[2]or m[1]==ep or ic or(b[m[1]]in'pnbrqk'and V[b[m[1]].upper()]+250>=V[b[m[0]]])]
  for m in ms:
   if b[m[1]]=='k':return M
   s=-qs(*fl(*ap(b,cs,ep,m)),-be,-a,q+1)
@@ -70,32 +69,31 @@ def sr(b,cs,ep,d,a,be):
  global nd;nd+=1
  if nd>cap:raise IndexError
  if d<=0:return qs(b,cs,ep,a,be,0)
- tm=TT.get((b,cs,ep));ms=list(gen(b,cs,ep))
- ms.sort(key=lambda m:(m!=tm,-(V[b[m[1]].upper()]if b[m[1]]in'pnbrqk'else V[m[2]]if m[2]else 0)));bm=None
+ k=(b,cs,ep);tm=TT.get(k);ms=list(gen(b,cs,ep))
+ ms.sort(key=lambda m:(m!=tm,-(V[b[m[1]].upper()]if b[m[1]]in'pnbrqk'else V.get(m[2],0)),m not in KL.get(d,())));bm=None
  for m in ms:
   if b[m[1]]=='k':return M
   s=-sr(*fl(*ap(b,cs,ep,m)),d-1,-be,-a)
   if s>a:a=s;bm=m
-  if a>=be:break
- TT[(b,cs,ep)]=bm
+  if a>=be:
+   if b[m[1]]not in'pnbrqk':KL.setdefault(d,set()).add(m)
+   break
+ TT[k]=bm
  return a
 def sq(s):return (10-int(s[1]))*10+ord(s[0])-96
 def pf(fen):
- ps=fen.split();b=[' ']*120;z=21
- for ch in ps[0]:
-  if ch=='/':z+=2
-  elif '0'<ch<':':
-   n=int(ch);b[z:z+n]=['.']*n;z+=n
-  else:b[z]=ch;z+=1
- cs=tuple(x in ps[2] for x in 'KQkq');ep=sq(ps[3]) if ps[3]!='-' else None;b=''.join(b)
+ ps=fen.split();s=ps[0]
+ for d in '12345678':s=s.replace(d,'.'*int(d))
+ b=' '*21+'  '.join(s.split('/'))+' '*21
+ cs=tuple(x in ps[2] for x in 'KQkq');ep=sq(ps[3]) if ps[3]!='-' else None
  if ps[1]=='b':b,cs,ep=fl(b,cs,ep)
  return b,cs,ep,ps[1]
 vm=lambda i:(11-i//10)*10+i%10
 def choose(fen,L):
  global nd
- b,cs,ep,tn=pf(fen);fb=tn=='b'
+ b,cs,ep,tn=pf(fen)
  rt=[(u,(sq(u),sq(u[2:]),u[4:].upper()))for u in L]
- if fb:rt=[(u,(vm(m[0]),vm(m[1]),m[2]))for u,m in rt]
+ if tn=='b':rt=[(u,(vm(m[0]),vm(m[1]),m[2]))for u,m in rt]
  nd=0;bu=rt[0][0]
  for d in range(1,30):
   rt.sort(key=lambda t:t[0]!=bu)
