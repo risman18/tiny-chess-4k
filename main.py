@@ -12,7 +12,7 @@ def gen(b,cs,ep):
   if c=='P':
    for d in(-11,-10,-9):
     j=i+d;t=b[j]
-    if t=='.' if d==-10 else t in 'pnbrqk' or j==ep:
+    if t=='.' if d==-10 else t in'pnbrqk' or j==ep:
      yield i,j,'Q' if j<30 else ''
    if i>80 and b[i-10]==b[i-20]=='.':yield i,i-20,''
   elif c in 'NKBRQ':
@@ -24,7 +24,7 @@ def gen(b,cs,ep):
       yield i,j,''
       if c in 'NK':break
       j+=d;continue
-     if t in 'pnbrqk':yield i,j,''
+     if t in'pnbrqk':yield i,j,''
      break
  for c2,r,t,e in((0,98,97,(96,97)),(1,91,93,(92,93,94))):
   if cs[c2] and b[95]=='K' and b[r]=='R' and all(b[x]=='.'for x in e):yield 95,t,''
@@ -75,8 +75,8 @@ def sr(b,cs,ep,d,a,be):
   c=fl(*ap(b,cs,ep,m))
   if i>2 and d>2 and not ic and b[m[1]]=='.'and not m[2]:
    s=-sr(*c,d-2,-a-1,-a)
-   if a<s:s=-sr(*c,d-1,-be,-a)
-  else:s=-sr(*c,d-1,-be,-a)
+   if a<s:s=-sr(*c,d-1+ic,-be,-a)
+  else:s=-sr(*c,d-1+ic,-be,-a)
   if s>a:a=s;bm=m
   if a>=be:break
  TT[k]=bm
@@ -105,7 +105,7 @@ def choose(fen,L):
     if s>a:a=s;bu=u
   except IndexError:break
  return bu
-EU=os.environ['MAKEFUN_ENV_URL']
+EU=os.getenv('MAKEFUN_ENV_URL')
 def post(p,b):return json.load(U.urlopen(EU+p,json.dumps(b).encode()))
 while 1:
  g=post('/game',{})
