@@ -1,8 +1,8 @@
 import json,os,urllib.request as U
 V=dict(zip('PNBRQK',(100,300,320,500,900,20000)))
 S=(-11,-9,9,11,-10,-1,1,10);D={'N':(-21,-19,-12,-8,8,12,19,21),'B':S[:4],'R':S[4:],'Q':S,'K':S}
-TS=dict(zip('PBKR','22222222<<<<<<<<44688644334774332226622231022013344..44322222222|.000000.032222300444444002444420033443300234432002222220.000000.|,**((**,,**((**,,**((**,,**((**,.,,**,,.0......06622226668422486|2222222234444443122222211222222112222221122222211222222122233222'.split('|')))
-TS['Q']=TS['B'];TS['N']=TS['B']
+TS=dict(zip('PBKRQ','22222222<<<<<<<<44688644334774332226622231022013344..44322222222|.000000.032222300444444002444420033443300234432002222220.000000.|,**((**,,**((**,,**((**,,**((**,.,,**,,.0......06622226668422486|2222222234444443122222211222222112222221122222211222222122233222|.000000.022222200233332012333321223333220333332002322220.000000.'.split('|')))
+TS['N']=TS['B']
 SG={}
 for p,t in TS.items():
  SG[p]=[0]*120;SG[p.lower()]=[0]*120
@@ -50,11 +50,10 @@ def atk(b):
   if b[k+d]=='k'or b[j] in('bq' if abs(d)in(9,11)else 'rq'):return 1
  return 0
 M=10**5
-class X(Exception):pass
 nd=0;cap=120000;TT={}
 def qs(b,cs,ep,a,be,q):
  global nd;nd+=1
- if nd>cap:raise X
+ if nd>cap:raise IndexError
  ic=q<1 and atk(b)
  if not ic:
   s=sum(SG[c][i] for i,c in enumerate(b) if c in SG)+30*(b.count('B')>1)-30*(b.count('b')>1)
@@ -69,7 +68,7 @@ def qs(b,cs,ep,a,be,q):
  return -M if ic and not ms else a
 def sr(b,cs,ep,d,a,be):
  global nd;nd+=1
- if nd>cap:raise X
+ if nd>cap:raise IndexError
  if d<=0:return qs(b,cs,ep,a,be,0)
  tm=TT.get((b,cs,ep));ms=list(gen(b,cs,ep))
  ms.sort(key=lambda m:(m!=tm,-(V[b[m[1]].upper()]if b[m[1]]in'pnbrqk'else V[m[2]]if m[2]else 0)));bm=None
@@ -97,7 +96,7 @@ def choose(fen,L):
  b,cs,ep,tn=pf(fen);fb=tn=='b'
  rt=[(u,(sq(u),sq(u[2:]),u[4:].upper()))for u in L]
  if fb:rt=[(u,(vm(m[0]),vm(m[1]),m[2]))for u,m in rt]
- nd=0;TT.clear();bu=rt[0][0]
+ nd=0;bu=rt[0][0]
  for d in range(1,30):
   rt.sort(key=lambda t:t[0]!=bu)
   try:
@@ -105,10 +104,10 @@ def choose(fen,L):
    for u,m in rt:
     s=-sr(*fl(*ap(b,cs,ep,m)),d-1,-M-1,-a)
     if s>a:a=s;bu=u
-  except X:break
+  except IndexError:break
  return bu
 EU=os.environ['MAKEFUN_ENV_URL']
-def post(p,b):return json.load(U.urlopen(U.Request(EU+p,data=json.dumps(b).encode())))
+def post(p,b):return json.load(U.urlopen(EU+p,json.dumps(b).encode()))
 while True:
  g=post('/game',{})
  if g['status']=='done':break

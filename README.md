@@ -18,7 +18,7 @@ Design:
 - Quiescence search over captures and promotions with stand-pat — except
   when the side to move is in check: then all evasions are searched (one
   ply deep), so mating attacks are not hidden by the horizon.
-- Evaluation is material, a bishop-pair bonus, plus piece-square tables packed as printable
+- Evaluation is material, a bishop-pair bonus, plus piece-specific square tables (pawn, bishop, knight, rook, queen, king) packed as printable
   strings (value = (ord(c) - 50) * 5), mirrored for the opponent.
 
 The program speaks the competition env protocol: it polls `POST /game` and
