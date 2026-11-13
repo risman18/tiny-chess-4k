@@ -49,7 +49,7 @@ def atk(b):
   if b[k+d]=='k'or b[j] in('bq' if abs(d)in(9,11)else 'rq'):return 1
  return 0
 M=10**5
-nd=0;cap=120000;TT={}
+nd=0;cap=90000;TT={}
 def qs(b,cs,ep,a,be,q):
  global nd;nd+=1
  if nd>cap:raise IndexError
