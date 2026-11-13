@@ -49,7 +49,7 @@ def atk(b):
   if b[k+d]=='k'or b[j] in('bq' if abs(d)in(9,11)else 'rq'):return 1
  return 0
 M=10**5
-nd=0;cap=120000;TT={};KL={}
+nd=0;cap=120000;TT={}
 def qs(b,cs,ep,a,be,q):
  global nd;nd+=1
  if nd>cap:raise IndexError
@@ -66,18 +66,19 @@ def qs(b,cs,ep,a,be,q):
   if s>a:a=s
  return -M if ic and not ms else a
 def sr(b,cs,ep,d,a,be):
- global nd;nd+=1
- if nd>cap:raise IndexError
  if d<=0:return qs(b,cs,ep,a,be,0)
  k=(b,cs,ep);tm=TT.get(k);ms=list(gen(b,cs,ep))
- ms.sort(key=lambda m:(m!=tm,-(V[b[m[1]].upper()]if b[m[1]]in'pnbrqk'else V.get(m[2],0)),m not in KL.get(d,())));bm=None
- for m in ms:
+ ms.sort(key=lambda m:(m!=tm,-(V[b[m[1]].upper()]if b[m[1]]in'pnbrqk'else V.get(m[2],0))));bm=None
+ ic=atk(b)
+ for i,m in enumerate(ms):
   if b[m[1]]=='k':return M
-  s=-sr(*fl(*ap(b,cs,ep,m)),d-1,-be,-a)
+  c=fl(*ap(b,cs,ep,m))
+  if i>2 and d>2 and not ic and b[m[1]]=='.'and not m[2]:
+   s=-sr(*c,d-2,-a-1,-a)
+   if a<s:s=-sr(*c,d-1,-be,-a)
+  else:s=-sr(*c,d-1,-be,-a)
   if s>a:a=s;bm=m
-  if a>=be:
-   if b[m[1]]not in'pnbrqk':KL.setdefault(d,set()).add(m)
-   break
+  if a>=be:break
  TT[k]=bm
  return a
 def sq(s):return (10-int(s[1]))*10+ord(s[0])-96
@@ -88,7 +89,7 @@ def pf(fen):
  cs=tuple(x in ps[2] for x in 'KQkq');ep=sq(ps[3]) if ps[3]!='-' else None
  if ps[1]=='b':b,cs,ep=fl(b,cs,ep)
  return b,cs,ep,ps[1]
-vm=lambda i:(11-i//10)*10+i%10
+vm=lambda i:110-i+i%10*2
 def choose(fen,L):
  global nd
  b,cs,ep,tn=pf(fen)
@@ -106,7 +107,7 @@ def choose(fen,L):
  return bu
 EU=os.environ['MAKEFUN_ENV_URL']
 def post(p,b):return json.load(U.urlopen(EU+p,json.dumps(b).encode()))
-while True:
+while 1:
  g=post('/game',{})
  if g['status']=='done':break
  while g['status']=='your_move':
